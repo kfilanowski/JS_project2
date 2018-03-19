@@ -40,3 +40,5 @@ function main() {
 if (require.main === module) {
   main();
 }
+
+//This is an attempt to make a weird branch thing
