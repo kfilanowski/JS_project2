@@ -1,7 +1,7 @@
 /**
  * make_poem.js
- * @author
- * @version 03/16/2018
+ * @author 
+ * @version 03/19/2018
  **/
 
  //Import file reading and the data_structure algorithms
@@ -13,13 +13,12 @@ var fs = require("fs");
  */
 function main(file, stanzas, lines, words, array_prob, display) {
 
-  //Lets test.
   //Read the file
   var data = fs.readFileSync(file, "utf-8").trim();
-  console.log("\nShould be : 3 Reds, 2 Blues, 1 Green Order: rbbrrg");
 
   if (display) {
     //Print test results
+    console.log("\nShould be : 3 Reds, 2 Blues, 1 Green Order: rbbrrg");
     console.log("\nThe word count is: ");
     var _wordCount = data_structure.wordCount(data);
     console.log(_wordCount);
@@ -51,7 +50,6 @@ function pickNextWord() {
 
 }
 
-//Not sure if this is needed?
 if (require.main === module) {
   main('rbbrrg_input_text.txt',1,2,3,[0.6,0.2,0.8,0.9,0.4,0.4],true);
 }
