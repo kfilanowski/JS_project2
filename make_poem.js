@@ -1,6 +1,6 @@
 /**
  * make_poem.js
- * @author 
+ * @author
  * @version 03/19/2018
  **/
 
@@ -15,6 +15,9 @@ function main(file, stanzas, lines, words, array_prob, display) {
 
   //Read the file
   var data = fs.readFileSync(file, "utf-8").trim();
+
+  var wordFrequency = data_structure.wordFreq(data);
+  var probability = findProbability(wordFrequency);
 
   if (display) {
     //Print test results
@@ -38,6 +41,34 @@ function main(file, stanzas, lines, words, array_prob, display) {
   }
 }
 
+/**
+ * Helper method to find the range of probabilities for each word.
+ * @param wordFrequency {Object} - Object containing the words and the
+ * frequency of those words in which they occur in a text file/String.
+ **/
+function findProbability(wordFrequency) {
+  var _key;
+  var ordered = {};
+  var probability = {};
+  var sum = 0;
+
+  //Sort the object
+  Object.keys(wordFrequency).sort().forEach(function(key) {
+    ordered[key] = wordFrequency[key];
+  });
+
+  //console.log(ordered);
+  //console.log(Object.keys(wordFrequency).sort());
+  //console.log(wordFrequency);
+
+  //Create a probablity array for the words.
+  for (_key in ordered) {
+    sum += ordered[_key];
+    probability[_key] = sum;
+  }
+  console.log(probability);
+}
+
 function makePoem() {
 
 }
@@ -51,5 +82,5 @@ function pickNextWord() {
 }
 
 if (require.main === module) {
-  main('rbbrrg_input_text.txt',1,2,3,[0.6,0.2,0.8,0.9,0.4,0.4],true);
+  main('rbbrrg_input_text.txt',1,2,3,[0.6,0.2,0.8,0.9,0.4,0.4],false);
 }
