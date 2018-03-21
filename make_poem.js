@@ -1,7 +1,7 @@
 /**
  * make_poem.js
  * @author
- * @version 03/19/2018
+ * @version 03/21/2018
  **/
 
  //Import file reading and the data_structure algorithms
@@ -12,12 +12,26 @@ var fs = require("fs");
  * Main function.
  */
 function main(file, stanzas, lines, words, array_prob, display) {
-
   //Read the file
   var data = fs.readFileSync(file, "utf-8").trim();
 
-  var wordFrequency = data_structure.wordFreq(data);
-  var probability = findProbability(wordFrequency);
+  //Testing probablity
+  var probability = findProbability(data);
+  console.log(probability);
+
+  //Testing pick first word
+  console.log("probability " + array_prob[0] + " is:");
+  pickFirstWord(data, array_prob);
+
+  //Testing findCondProbability
+
+
+  //Testing pickNextWord
+
+
+  //Testing makePoem
+
+
 
   if (display) {
     //Print test results
@@ -37,50 +51,89 @@ function main(file, stanzas, lines, words, array_prob, display) {
     console.log("\nThe conditional word frequency is: ");
     var _condWordFreq = data_structure.condWordFreq(data);
     console.log(_condWordFreq);
-    console.log("");
+
+    console.log(_condWordFreq["blue"]["blue"]);
   }
 }
 
 /**
- * Helper method to find the range of probabilities for each word.
- * @param wordFrequency {Object} - Object containing the words and the
- * frequency of those words in which they occur in a text file/String.
+ *
+ *
+ *
  **/
-function findProbability(wordFrequency) {
+function findCondProbability(data) {
+
+}
+
+/**
+ * Helper method to find the range of probabilities for each word.
+ * @requires data_strctures.js - Functions wordFreq and wordCount required.
+ * @param {String} data - String containing all of the words in a file.
+ * @return {Object} ordered - Sorted object containing the probability
+ * range for each word in wordFrequency.
+ **/
+function findProbability(data) {
   var _key;
+  var wordFrequency
   var ordered = {};
-  var probability = {};
   var sum = 0;
 
   //Sort the object
+  wordFrequency = data_structure.wordFreq(data);
   Object.keys(wordFrequency).sort().forEach(function(key) {
     ordered[key] = wordFrequency[key];
   });
 
-  //console.log(ordered);
-  //console.log(Object.keys(wordFrequency).sort());
-  //console.log(wordFrequency);
-
   //Create a probablity array for the words.
   for (_key in ordered) {
     sum += ordered[_key];
-    probability[_key] = sum;
+    ordered[_key] = sum;
   }
-  console.log(probability);
+  return ordered;
 }
 
+/**
+ *
+ *
+ *
+ **/
 function makePoem() {
 
 }
 
-function pickFirstWord() {
+/**
+ * Prints the first word of the poem depending on the probability of all words
+ * in the input file and the first probability in the probability array
+ * given by the user.
+ * @param {String} data - String containing all of the words in a file.
+ * @param {Object} array_prob - The array of probabilities given by the user.
+ **/
+function pickFirstWord(data, array_prob) {
+  var key;
+  var probability = findProbability(data);
 
+  for (key in probability) {
+    if (array_prob[0] <= probability[key]) {
+      console.log(key);
+      break;
+    }
+  }
 }
 
+/**
+ *
+ *
+ *
+ **/
 function pickNextWord() {
 
 }
 
+/**
+ *
+ *
+ *
+ **/
 if (require.main === module) {
   main('rbbrrg_input_text.txt',1,2,3,[0.6,0.2,0.8,0.9,0.4,0.4],false);
 }
