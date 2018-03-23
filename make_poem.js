@@ -25,7 +25,8 @@ function main(file, stanzas, lines, words, array_prob, display) {
 
   //Testing findCondProbability
 
-
+	var prob_ability = findProbability(data);
+	console.log(prob_ability);
   //Testing pickNextWord
 
 
@@ -62,7 +63,15 @@ function main(file, stanzas, lines, words, array_prob, display) {
  *
  **/
 function findCondProbability(data) {
-
+	var ordered = {};
+	var condWordFrequency;
+	
+	condWordFrequency = data_structure.condWordFreq(data);
+	Object.keys(condWordFrequency).sort().forEach(function(key) {
+    ordered[key] = condWordFrequency[key];
+  });
+  return ordered;
+	
 }
 
 /**
@@ -126,7 +135,7 @@ function pickFirstWord(data, array_prob) {
  *
  **/
 function pickNextWord() {
-
+	var probability = findCondProbability(data);
 }
 
 /**
