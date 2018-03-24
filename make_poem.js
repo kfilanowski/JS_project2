@@ -18,18 +18,22 @@ function main(file, stanzas, lines, words, array_prob, display) {
   //Testing probablity
   var probability = findProbability(data);
   console.log(probability);
+  console.log("--------------------------------------");
 
   //Testing pick first word
-  console.log("probability " + array_prob[0] + " is:");
-  pickFirstWord(data, array_prob);
+  //console.log("probability " + array_prob[0] + " is:");
+  //pickFirstWord(data, array_prob);
 
   //Testing findCondProbability
-
+  var condProbability = findCondProbability(data);
+  console.log(condProbability);
 
   //Testing pickNextWord
 
 
   //Testing makePoem
+
+  //random
 
 
 
@@ -62,7 +66,35 @@ function main(file, stanzas, lines, words, array_prob, display) {
  *
  **/
 function findCondProbability(data) {
+  var ordered = {};
+  var ordered2 = {};
+  var _key = {};
+  var condWordFrequency;
 
+  condWordFrequency = data_structure.condWordFreq(data);
+  console.log(condWordFrequency);
+
+  Object.keys(condWordFrequency).sort().forEach(function(key) {
+    Object.keys(condWordFrequency[key]).sort().forEach(function(key2) {
+      ordered[key] = condWordFrequency[key][key2];
+    });
+
+    //Object.keys(ordered[key]).sort().forEach(function(key2) {
+    //  ordered2[key][key2] = ordered[key][key2];
+    //});
+    /*
+    for (_key in ordered[key]) {
+      console.log("~~~~~~~~~~~");
+
+      console.log(_key);
+      console.log("~~~~~~~~~~~");
+    }
+    console.log("NEXT OBJECT");
+    */
+  });
+
+  console.log("\n");
+  return ordered;
 }
 
 /**
