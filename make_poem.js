@@ -15,20 +15,25 @@ function main(file, stanzas, lines, words, array_prob, display) {
   //Read the file
   var data = fs.readFileSync(file, "utf-8").trim();
 
-  //Testing probablity
+  console.log("\nTesting probablity");
+  console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
   var probability = findProbability(data);
   console.log(probability);
-  console.log("--------------------------------------");
+  console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 
-  //Testing pick first word
-  //console.log("probability " + array_prob[0] + " is:");
-  //pickFirstWord(data, array_prob);
+  console.log("Testing pick first word");
+  console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+  console.log("probability " + array_prob[0] + " is:");
+  pickFirstWord(data, array_prob);
+  console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 
-  //Testing findCondProbability
+  console.log("Testing findCondProbability");
+  console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
   var condProbability = findCondProbability(data);
   console.log(condProbability);
+  console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 
-  //Testing pickNextWord
+  //console.log("Testing pickNextWord");
 
 
   //Testing makePoem
@@ -66,34 +71,34 @@ function main(file, stanzas, lines, words, array_prob, display) {
  *
  **/
 function findCondProbability(data) {
-  var ordered = {};
-  var ordered2 = {};
-  var _key = {};
-  var condWordFrequency;
-
-  condWordFrequency = data_structure.condWordFreq(data);
-  console.log(condWordFrequency);
+  var _key;
+  var ordered      = {};
+  var value_object = {};
+  var key_array    = [];
+  var condWordFrequency = data_structure.condWordFreq(data);
 
   Object.keys(condWordFrequency).sort().forEach(function(key) {
-    Object.keys(condWordFrequency[key]).sort().forEach(function(key2) {
-      ordered[key] = condWordFrequency[key][key2];
-    });
+    //Sort all the keys (not values), and assign it to a new object.
+    ordered[key] = condWordFrequency[key];
 
-    //Object.keys(ordered[key]).sort().forEach(function(key2) {
-    //  ordered2[key][key2] = ordered[key][key2];
-    //});
-    /*
-    for (_key in ordered[key]) {
-      console.log("~~~~~~~~~~~");
+    //Store the value's keys
+    for (_key in ordered[key]) key_array.push(_key);
 
-      console.log(_key);
-      console.log("~~~~~~~~~~~");
+    //Sort the keys alphabetically.
+    key_array.sort();
+
+    //Create a new sorted value-key object.
+    for (var i in key_array) {
+      value_object[key_array[i]] = ordered[key][key_array[i]];
     }
-    console.log("NEXT OBJECT");
-    */
-  });
 
-  console.log("\n");
+    //Assign the ordered values to the proper location.
+    ordered[key] = value_object;
+
+    //Reset for the next iteration.
+    value_object = {};
+    key_array = [];
+  });
   return ordered;
 }
 
