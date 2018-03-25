@@ -15,22 +15,30 @@ function main(file, stanzas, lines, words, array_prob, display) {
   //Read the file
   var data = fs.readFileSync(file, "utf-8").trim();
 
-  //Testing probablity
+  console.log("\nTesting probablity");
+  console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
   var probability = findProbability(data);
   console.log(probability);
+  console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 
-  //Testing pick first word
+  console.log("Testing pick first word");
+  console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
   console.log("probability " + array_prob[0] + " is:");
   pickFirstWord(data, array_prob);
+  console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 
-  //Testing findCondProbability
+  console.log("Testing findCondProbability");
+  console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+  var condProbability = findCondProbability(data);
+  console.log(condProbability);
+  console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 
-	var prob_ability = findProbability(data);
-	console.log(prob_ability);
-  //Testing pickNextWord
+  //console.log("Testing pickNextWord");
 
 
   //Testing makePoem
+
+  //random
 
 
 
@@ -63,15 +71,35 @@ function main(file, stanzas, lines, words, array_prob, display) {
  *
  **/
 function findCondProbability(data) {
-	var ordered = {};
-	var condWordFrequency;
-	
-	condWordFrequency = data_structure.condWordFreq(data);
-	Object.keys(condWordFrequency).sort().forEach(function(key) {
+  var _key;
+  var ordered      = {};
+  var value_object = {};
+  var key_array    = [];
+  var condWordFrequency = data_structure.condWordFreq(data);
+
+  Object.keys(condWordFrequency).sort().forEach(function(key) {
+    //Sort all the keys (not values), and assign it to a new object.
     ordered[key] = condWordFrequency[key];
+
+    //Store the value's keys
+    for (_key in ordered[key]) key_array.push(_key);
+
+    //Sort the keys alphabetically.
+    key_array.sort();
+
+    //Create a new sorted value-key object.
+    for (var i in key_array) {
+      value_object[key_array[i]] = ordered[key][key_array[i]];
+    }
+
+    //Assign the ordered values to the proper location.
+    ordered[key] = value_object;
+
+    //Reset for the next iteration.
+    value_object = {};
+    key_array = [];
   });
   return ordered;
-	
 }
 
 /**
