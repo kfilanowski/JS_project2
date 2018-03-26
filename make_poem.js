@@ -1,6 +1,6 @@
 /**
  * make_poem.js
- * @author
+ * @author Kevin Filanowski, Caleb Tupone
  * @version 03/21/2018
  **/
 
@@ -9,60 +9,27 @@ var data_structure = require("./data_structures.js");
 var fs = require("fs");
 
 /**
- * Main function.
+ * Main function. Calls all of the methods.
+ * @param {String} file - The name of the textfile in the local directory.
+ * @param {Number} stanzas - How many stanzas in the poem.
+ * @param {Number} lines - How many lines per stanza in the poem.
+ * @param {Number} words - How many words per line.
+ * @param {Object} array_prob - Array of probabilities. The number of elements
+ * in this array is equal to the number of words expected to be printed.
+ * @param {Boolean} display - Whether or not to display extra diagnostic data.
  */
 function main(file, stanzas, lines, words, array_prob, display) {
   //Read the file
   var data = fs.readFileSync(file, "utf-8").trim();
 
-  console.log("\nTesting probablity");
-  console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-  var probability = findProbability(data);
-  console.log(probability);
-  console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-
-  console.log("Testing pick first word");
-  console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-  console.log("probability " + array_prob[0] + " is:");
-  pickFirstWord(data, array_prob);
-  console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-
-  console.log("Testing findCondProbability");
-  console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-  var condProbability = findCondProbability(data);
-  console.log(condProbability);
-  console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
-
-  //console.log("Testing pickNextWord");
-
-
-  //Testing makePoem
-
-  //random
-
-
-
+  //Display data
   if (display) {
-    //Print test results
-    console.log("\nShould be : 3 Reds, 2 Blues, 1 Green Order: rbbrrg");
-    console.log("\nThe word count is: ");
-    var _wordCount = data_structure.wordCount(data);
-    console.log(_wordCount);
-
-    console.log("\nThe word frequency is: ");
-    var _wordFreq = data_structure.wordFreq(data);
-    console.log(_wordFreq);
-
-    console.log("\nThe conditional word count is: ");
-    var _condWordCount = data_structure.condWordCount(data);
-    console.log(_condWordCount);
-
-    console.log("\nThe conditional word frequency is: ");
-    var _condWordFreq = data_structure.condWordFreq(data);
-    console.log(_condWordFreq);
-
-    console.log(_condWordFreq["blue"]["blue"]);
+    displayDiagnostics(data);
   }
+
+  //Call makePoem
+
+
 }
 
 /**
@@ -70,22 +37,76 @@ function main(file, stanzas, lines, words, array_prob, display) {
  *
  *
  **/
+ function displayDiagnostics(data) {
+   console.log("\nThe word count is: ");
+   var _wordCount = data_structure.wordCount(data);
+   console.log(_wordCount);
+
+   console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+   console.log("\nThe word frequency is: "); //:D
+   var _wordFreq = data_structure.wordFreq(data);
+   console.log(_wordFreq);
+
+   console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+   console.log("\nThe conditional word count is: ");
+   var _condWordCount = data_structure.condWordCount(data);
+   console.log(_condWordCount);
+
+   console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+   console.log("\nThe conditional word frequency is: ");
+   var _condWordFreq = data_structure.condWordFreq(data);
+   console.log(_condWordFreq);
+
+   console.log("\nTesting probability");
+   console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+   var probability = findProbability(data);
+   console.log(probability);
+   console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+
+   console.log("Testing pick first word");
+   console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+   console.log("probability 0.6 is:");
+   var firstWord = pickFirstWord(data, 0.6);
+   console.log(firstWord);
+   console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+
+   console.log("Testing findCondProbability");
+   console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+   var condProbability = findCondProbability(data);
+   console.log(condProbability);
+   console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+
+   console.log("Testing pickNextWord");
+   console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+   console.log("probability 0.4 and last word is green gives:");
+   var nextWord = pickNextWord(data, 0.4, "green");
+   console.log(nextWord);
+   console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+ }
+
+
+
+/**
+* Helper method to find the range of probabilities for each condition word.
+* @requires data_strctures.js - Function required.
+* @param {String} data - String containing all of the words in a file.
+* @return {Object} ordered - Sorted object containing the probability
+* range for each word in condWordFrequency.
+**/
 function findCondProbability(data) {
   var _key;
   var ordered      = {};
   var value_object = {};
   var key_array    = [];
   var condWordFrequency = data_structure.condWordFreq(data);
+  var sum = 0;
 
   Object.keys(condWordFrequency).sort().forEach(function(key) {
     //Sort all the keys (not values), and assign it to a new object.
     ordered[key] = condWordFrequency[key];
 
-    //Store the value's keys
-    for (_key in ordered[key]) key_array.push(_key);
-
-    //Sort the keys alphabetically.
-    key_array.sort();
+    //Store the value's keys and sort the keys alphabetically.
+    key_array = Object.keys(condWordFrequency[key]).sort();
 
     //Create a new sorted value-key object.
     for (var i in key_array) {
@@ -95,9 +116,16 @@ function findCondProbability(data) {
     //Assign the ordered values to the proper location.
     ordered[key] = value_object;
 
+    //Assign all of the probabilities for the current value.
+    for (var i in key_array) {
+      sum += ordered[key][key_array[i]];
+      ordered[key][key_array[i]] = sum;
+    }
+
     //Reset for the next iteration.
-    value_object = {};
     key_array = [];
+    value_object = {};
+    sum = 0;
   });
   return ordered;
 }
@@ -121,7 +149,7 @@ function findProbability(data) {
     ordered[key] = wordFrequency[key];
   });
 
-  //Create a probablity array for the words.
+  //Create a probability array for the words.
   for (_key in ordered) {
     sum += ordered[_key];
     ordered[_key] = sum;
@@ -134,25 +162,60 @@ function findProbability(data) {
  *
  *
  **/
-function makePoem() {
+function makePoem(data, array_prob, stanzas, lines, words) {
+var firstWord = pickFirstWord(data, array_prob[0]);
+
+// Do you think maybe we can use an array to store every words that pickNextWord returns? or
+// would it be easier to just print as we go? my only problem with the array is the line count
+//===> I think just printing it would be fine honestly.<=======//
+
+  for (var i = 0; i < stanzas; i++) { //stanzas
+
+    for (var j = 0; j < lines; j++) { //lines
+
+      for (var k = 0; k < words; k++) { //words
+        //var nextWord = pickNextWord(data, prob, word);
+      }
+    }
+  }
 
 }
 
 /**
- * Prints the first word of the poem depending on the probability of all words
- * in the input file and the first probability in the probability array
- * given by the user.
+ * Returns the first word of the poem depending on the probability of
+ * all words in the input file and the first probability in the
+ * probability array given by the user.
  * @param {String} data - String containing all of the words in a file.
- * @param {Object} array_prob - The array of probabilities given by the user.
+ * @param {Number} prob - The next probability in the probability array.
+ * @return {String} key - The word that was picked.
  **/
-function pickFirstWord(data, array_prob) {
+function pickFirstWord(data, prob) {
   var key;
   var probability = findProbability(data);
 
   for (key in probability) {
-    if (array_prob[0] <= probability[key]) {
-      console.log(key);
-      break;
+    if (prob <= probability[key]) {
+      return key;
+    }
+  }
+}
+
+/**
+ * Returns the next word of the poem depending on the probability of
+ * all words in the input file and the next probability in the
+ * probability array given by the user.
+ * @param {String} data - String containing all of the words in a file.
+ * @param {Number} prob - The next probability in the probability array.
+ * @param {String} previousWord - The previous word in the sequence.
+ * @return {String} key - The word that was picked.
+ **/
+function pickNextWord(data, prob, previousWord) {
+  var key;
+	var probability = findCondProbability(data);
+
+  for (key in probability[previousWord]) {
+    if (prob <= probability[previousWord][key]) {
+      return key;
     }
   }
 }
@@ -162,15 +225,6 @@ function pickFirstWord(data, array_prob) {
  *
  *
  **/
-function pickNextWord() {
-	var probability = findCondProbability(data);
-}
-
-/**
- *
- *
- *
- **/
 if (require.main === module) {
-  main('rbbrrg_input_text.txt',1,2,3,[0.6,0.2,0.8,0.9,0.4,0.4],false);
+  main('rbbrrg_input_text.txt',1,2,3,[0.6,0.2,0.8,0.9,0.4,0.4],true);
 }
