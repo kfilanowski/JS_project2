@@ -240,9 +240,12 @@ function pickNextWord(data, prob, previousWord) {
    for (var s in data) {
      if (data[s] != "\n" && data[s] != "\r" && data[s] != "\t") {
        temp += data[s];
+
      } else {
-       temp += " ";
+      if(temp[temp.length -1] != " ")
+        temp += " ";
      }
+     //console.log(temp);
    }
    console.log(temp);
    console.log("\n");
