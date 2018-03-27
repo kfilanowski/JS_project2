@@ -1,10 +1,11 @@
 /**
- * make_poem.js
+ * makePoem.js creates a poem based on input parameters and a file containing
+ * lots of words.
  * @author Kevin Filanowski, Caleb Tupone
- * @version 03/21/2018
- **/
+ * @version 03/27/2018
+**/
 
- //Import file reading and the data_structure algorithms
+//Import file reading and the data_structure algorithms
 var data_structure = require("./data_structures.js");
 var fs = require("fs");
 
@@ -17,80 +18,74 @@ var fs = require("fs");
  * @param {Object} array_prob - Array of probabilities. The number of elements
  * in this array is equal to the number of words expected to be printed.
  * @param {Boolean} display - Whether or not to display extra diagnostic data.
- */
+**/
 function main(file, stanzas, lines, words, array_prob, display) {
   //Read the file
   var data = fs.readFileSync(file, "utf-8").trim();
+  data = removeDelimiters(data);
 
-  //Display data
-  if (display) {
-    displayDiagnostics(data);
+  if (data.length > 0) {
+    //Display data
+    if (display)
+      displayDiagnostics(data);
+    console.log(makePoem(data, array_prob, stanzas, lines, words));
+  } else {
+    console.log("File '" + file + "' is empty.");
   }
-
-  //Call makePoem
-
-
 }
 
 /**
- *
- *
- *
+ * A function that displays diagnostic and verbose information about the
+ * methods used to create makePoem.
+ * @param {String} data - String containing all of the words in a file.
  **/
  function displayDiagnostics(data) {
-   console.log("\nThe word count is: ");
+   console.log("The word count is: ");
    var _wordCount = data_structure.wordCount(data);
    console.log(_wordCount);
 
    console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-   console.log("\nThe word frequency is: "); //:D
+   console.log("The word frequency is: ");
    var _wordFreq = data_structure.wordFreq(data);
    console.log(_wordFreq);
 
    console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-   console.log("\nThe conditional word count is: ");
+   console.log("The conditional word count is: ");
    var _condWordCount = data_structure.condWordCount(data);
    console.log(_condWordCount);
 
    console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-   console.log("\nThe conditional word frequency is: ");
+   console.log("The conditional word frequency is: ");
    var _condWordFreq = data_structure.condWordFreq(data);
    console.log(_condWordFreq);
 
-   console.log("\nTesting probability");
    console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+   console.log("Testing probability");
    var probability = findProbability(data);
    console.log(probability);
-   console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 
+   console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
    console.log("Testing pick first word");
-   console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-   console.log("probability 0.6 is:");
    var firstWord = pickFirstWord(data, 0.6);
-   console.log(firstWord);
-   console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+   console.log("probability 0.6 is: " + firstWord);
 
-   console.log("Testing findCondProbability");
    console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+   console.log("Testing findCondProbability");
    var condProbability = findCondProbability(data);
    console.log(condProbability);
-   console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
 
-   console.log("Testing pickNextWord");
    console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-   console.log("probability 0.4 and last word is green gives:");
+   console.log("Testing pickNextWord");
    var nextWord = pickNextWord(data, 0.4, "green");
-   console.log(nextWord);
-   console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n");
+   console.log("probability 0.4 and last word is green gives: " + nextWord);
+   console.log("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
  }
-
-
 
 /**
 * Helper method to find the range of probabilities for each condition word.
-* @requires data_strctures.js - Function required.
+* @requires data_structures.js - condWordFreq and condWordCount function needed.
 * @param {String} data - String containing all of the words in a file.
-* @return {Object} ordered - Sorted object containing the probability
+* @return {Object} - Sorted object containing the probability
 * range for each word in condWordFrequency.
 **/
 function findCondProbability(data) {
@@ -132,9 +127,9 @@ function findCondProbability(data) {
 
 /**
  * Helper method to find the range of probabilities for each word.
- * @requires data_strctures.js - Functions wordFreq and wordCount required.
+ * @requires data_structures.js - Functions wordFreq and wordCount required.
  * @param {String} data - String containing all of the words in a file.
- * @return {Object} ordered - Sorted object containing the probability
+ * @return {Object} - Sorted object containing the probability
  * range for each word in wordFrequency.
  **/
 function findProbability(data) {
@@ -158,27 +153,41 @@ function findProbability(data) {
 }
 
 /**
- *
- *
- *
- **/
+ * Takes information from main, such as amounts of stanzas, lines, words
+ * and probabilities to build a 'poem' out of a provided text file.
+ * @param {String} data - String containing all fo the words in a file.
+ * @param {Object} array_prob - Array of probabilities. The number of elements
+ * in this array is equal to the number of words expected to be printed.
+ * @param {Number} stanza - The number of stanzas in a poem.
+ * @param {Number} lines - The number of lines in a stanza.
+ * @param {Number} words - The number of words in a line.
+ * @return {String} - The complete formatted poem.
+**/
 function makePoem(data, array_prob, stanzas, lines, words) {
-var firstWord = pickFirstWord(data, array_prob[0]);
+  var nextWord;
+  var lastWord = pickFirstWord(data, array_prob[0]);
+  var poem = lastWord + " ";
+  var wordCount = 0;
+  var tmp_len = 1;
 
-// Do you think maybe we can use an array to store every words that pickNextWord returns? or
-// would it be easier to just print as we go? my only problem with the array is the line count
-//===> I think just printing it would be fine honestly.<=======//
-
-  for (var i = 0; i < stanzas; i++) { //stanzas
-
-    for (var j = 0; j < lines; j++) { //lines
-
-      for (var k = 0; k < words; k++) { //words
-        //var nextWord = pickNextWord(data, prob, word);
+  for (var i = 0; i < stanzas; i++) {
+    for (var j = 0; j < lines; j++) {
+      for (var k = tmp_len; k < words; k++) {
+        wordCount++;
+        nextWord = pickNextWord(data, array_prob[wordCount], lastWord);
+        poem += nextWord + " ";
+        lastWord = nextWord;
       }
+      tmp_len = 0; // Sets length of array back to 0 for the next line.
+      //Add spaces if there are additional lines.
+      if (j < lines-1)
+        poem += "\n";
     }
+    //Add spaces if there are additional lines.
+    if (i < stanzas-1)
+      poem += "\n\n";
   }
-
+  return poem;
 }
 
 /**
@@ -187,7 +196,7 @@ var firstWord = pickFirstWord(data, array_prob[0]);
  * probability array given by the user.
  * @param {String} data - String containing all of the words in a file.
  * @param {Number} prob - The next probability in the probability array.
- * @return {String} key - The word that was picked.
+ * @return {String} - The word that was picked.
  **/
 function pickFirstWord(data, prob) {
   var key;
@@ -207,7 +216,7 @@ function pickFirstWord(data, prob) {
  * @param {String} data - String containing all of the words in a file.
  * @param {Number} prob - The next probability in the probability array.
  * @param {String} previousWord - The previous word in the sequence.
- * @return {String} key - The word that was picked.
+ * @return {String} - The word that was picked.
  **/
 function pickNextWord(data, prob, previousWord) {
   var key;
@@ -224,7 +233,22 @@ function pickNextWord(data, prob, previousWord) {
  *
  *
  *
+ *
  **/
+ function removeDelimiters(data) {
+   var temp = "";
+   for (var s in data) {
+     if (data[s] != "\n" && data[s] != "\r" && data[s] != "\t") {
+       temp += data[s];
+     } else {
+       temp += " ";
+     }
+   }
+   console.log(temp);
+   console.log("\n");
+   return temp;
+ }
+
 if (require.main === module) {
-  main('rbbrrg_input_text.txt',1,2,3,[0.6,0.2,0.8,0.9,0.4,0.4],true);
+  main('newline_input_text.txt',1,2,3,[0.6,0.2,0.8,0.9,0.4,0.4],false);
 }
