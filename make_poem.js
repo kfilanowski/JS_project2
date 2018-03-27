@@ -237,6 +237,8 @@ function pickNextWord(data, prob, previousWord) {
  **/
  function removeDelimiters(data) {
    var temp = "";
+   var previousSpace = false;
+
    for (var s in data) {
      if (data[s] != "\n" && data[s] != "\r" && data[s] != "\t") {
        temp += data[s];
