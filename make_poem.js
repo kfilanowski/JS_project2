@@ -2,7 +2,7 @@
  * makePoem.js creates a poem based on input parameters and a file containing
  * lots of words.
  * @author Kevin Filanowski, Caleb Tupone
- * @version 03/27/2018
+ * @version 03/28/2018
 **/
 
 //Import file reading and the data_structure algorithms
@@ -230,30 +230,26 @@ function pickNextWord(data, prob, previousWord) {
 }
 
 /**
- *
- *
- *
- *
+ * Replaces all \n, \r, and \t in a string with a space, only if there is not
+ * a space in the previous character. Otherwise, it is just removed.
+ * @param {String} data - String containing all of the words in a file.
+ * @return {String} - data except without newline characters, tabs, and another
+ * types of delimiters. [\r, \t, \n]
  **/
  function removeDelimiters(data) {
    var temp = "";
    var previousSpace = false;
 
    for (var s in data) {
-     if (data[s] != "\n" && data[s] != "\r" && data[s] != "\t") {
-       temp += data[s];
-
-     } else {
-      if(temp[temp.length -1] != " ")
-        temp += " ";
-     }
-     //console.log(temp);
+		 if (data[s] != "\n" && data[s] != "\r" && data[s] != "\t")
+		   temp += data[s];
+		 else
+		   if (temp[temp.length -1] != " ")
+			   temp += " ";
    }
-   console.log(temp);
-   console.log("\n");
    return temp;
  }
 
 if (require.main === module) {
-  main('newline_input_text.txt',1,2,3,[0.6,0.2,0.8,0.9,0.4,0.4],false);
+  main('rbrbb_input_text.txt',1,2,3,[0.6,0.2,0.8,0.9,0.4,0.4],false);
 }
